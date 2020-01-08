@@ -1,6 +1,8 @@
 # shortest_distance_benchmark
 Benchmark of finding the shortest distance with sqrt or without sqrt
 
+![Length of line formula](https://github.com/shaovoon/shortest_distance_benchmark/blob/master/length_of_line_formula.png)
+
 Built in Release x64.
 
 ```
