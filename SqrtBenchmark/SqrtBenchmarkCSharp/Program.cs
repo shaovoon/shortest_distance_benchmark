@@ -14,8 +14,7 @@ namespace SqrtBenchmarkCSharp
     {
         static Random random = new Random();
 
-        // Generate a random number between two numbers  
-        static public double GetRand()
+       static public double GetRand()
         {
             return random.NextDouble() * 1000.0;
         }
