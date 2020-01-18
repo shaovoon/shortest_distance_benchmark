@@ -43,16 +43,19 @@ namespace SqrtBenchmarkCSharp
                 list.Add(pt);
             }
 
-            double shortest = 10000000.0;
+            double shortest = double.MaxValue;
             int shortest_index = 0;
-            double shortest2 = 10000000.0;
+            double shortest2 = double.MaxValue;
             int shortest_index2 = 0;
+            double shortest3 = double.MaxValue;
+            double shortest_abs = double.MaxValue;
+            int shortest_index3 = 0;
 
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < MAX_LOOP; ++i)
             {
-                shortest = 10000000.0;
+                shortest = double.MaxValue;
                 shortest_index = 0;
 
                 for (int j = 0; j < list.Count; ++j)
@@ -77,7 +80,7 @@ namespace SqrtBenchmarkCSharp
             stopWatch.Start();
             for (int i = 0; i < MAX_LOOP; ++i)
             {
-                shortest2 = 10000000.0;
+                shortest2 = double.MaxValue;
                 shortest_index2 = 0;
 
                 for (int j = 0; j < list.Count; ++j)
@@ -99,9 +102,39 @@ namespace SqrtBenchmarkCSharp
             stopWatch.Stop();
             DisplayElapseTime("Without sqrt", stopWatch.Elapsed);
 
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
+            for (int i = 0; i < MAX_LOOP; ++i)
+            {
+                shortest3 = double.MaxValue;
+                shortest_index3 = 0;
 
-            Console.WriteLine("shortest: {0}, {1}", shortest, shortest2);
-            Console.WriteLine("shortest_index: {0}, {1}", shortest_index, shortest_index2);
+                for (int j = 0; j < list.Count; ++j)
+                {
+                    Point pt = list[j];
+                    double x = Math.Abs(pt.x - dest.x); // N.B.: abs!
+                    if (x > shortest_abs) continue; // bail out
+
+                    double y = Math.Abs(pt.y - dest.y);
+                    if (y > shortest_abs) continue;
+
+                    double xq = x * x;
+                    double yq = y * y;
+                    double distance = xq + yq;
+                    if (distance < shortest3)
+                    {
+                        shortest3 = distance;
+                        shortest_abs = x + y;
+                        shortest_index3 = j;
+                    }
+                }
+                shortest3 = Math.Sqrt(shortest3);
+            }
+            stopWatch.Stop();
+            DisplayElapseTime("Bait out before square", stopWatch.Elapsed);
+
+            Console.WriteLine("shortest: {0}, {1}, {2}", shortest, shortest2, shortest3);
+            Console.WriteLine("shortest_index: {0}, {1}, {2}", shortest_index, shortest_index2, shortest_index3);
 
 
         }

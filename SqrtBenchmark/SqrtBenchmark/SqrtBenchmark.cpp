@@ -23,7 +23,7 @@ public:
 		auto end = std::chrono::high_resolution_clock::now();
 		auto dur = end - begin;
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-		std::cout << std::setw(16) << text << " timing:" << std::setw(5) << ms << "ms" << std::endl;
+		std::cout << std::setw(23) << text << " timing:" << std::setw(5) << ms << "ms" << std::endl;
 	}
 
 private:
@@ -76,16 +76,19 @@ int main()
 	InitVector(vec, 1000);
 	Point dest(RandomNumGen::GetRand(), RandomNumGen::GetRand());
 
-	double shortest = 10000000.0;
+	double shortest = std::numeric_limits<double>::max();
 	size_t shortest_index = 0;
-	double shortest2 = 10000000.0;
+	double shortest2 = std::numeric_limits<double>::max();
 	size_t shortest_index2 = 0;
+	double shortest3 = std::numeric_limits<double>::max();
+	double shortest_abs = std::numeric_limits<double>::max();
+	size_t shortest_index3 = 0;
 
 	timer stopwatch;
 	stopwatch.start("With sqrt");
 	for (size_t i = 0; i < MAX_LOOP; ++i)
 	{
-		shortest = 10000000.0;
+		shortest = std::numeric_limits<double>::max();
 		shortest_index = 0;
 		for (size_t j = 0; j < vec.size(); ++j)
 		{
@@ -107,7 +110,7 @@ int main()
 	stopwatch.start("Without sqrt");
 	for (size_t i = 0; i < MAX_LOOP; ++i)
 	{
-		shortest2 = 10000000.0;
+		shortest2 = std::numeric_limits<double>::max();
 		shortest_index2 = 0;
 		for (size_t j = 0; j < vec.size(); ++j)
 		{
@@ -127,8 +130,37 @@ int main()
 	}
 	stopwatch.stop();
 
-	std::cout << "shortest: " << shortest << ", " << shortest2 << std::endl;
-	std::cout << "shortest index: " << shortest_index << ", " << shortest_index2 << std::endl;
+	stopwatch.start("Bait out before square");
+	for (size_t i = 0; i < MAX_LOOP; ++i)
+	{
+		shortest3 = std::numeric_limits<double>::max();
+		shortest_index3 = 0;
+		shortest_abs = std::numeric_limits<double>::max();
+		for (size_t j = 0; j < vec.size(); ++j)
+		{
+			const auto& pt = vec[j];
+			double x = fabs(pt.x - dest.x); // N.B.: abs!
+			if (x > shortest_abs) continue; // bail out
+
+			double y = fabs(pt.y - dest.y);
+			if (y > shortest_abs) continue;
+
+			double xq = x * x;
+			double yq = y * y;
+			double distance = xq + yq;
+			if (distance < shortest3)
+			{
+				shortest3 = distance;
+				shortest_abs = x + y;
+				shortest_index3 = j;
+			}
+		}
+		shortest3 = sqrt(shortest3);
+	}
+	stopwatch.stop();
+
+	std::cout << "shortest: " << shortest << ", " << shortest2 << ", " << shortest3 << std::endl;
+	std::cout << "shortest index: " << shortest_index << ", " << shortest_index2 << ", " << shortest_index3 << std::endl;
 
     std::cout << "Done!\n";
 }
